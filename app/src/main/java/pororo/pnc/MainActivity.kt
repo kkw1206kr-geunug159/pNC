@@ -30,10 +30,10 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -67,6 +67,8 @@ class MainActivity : ComponentActivity() {
                         .verticalScroll(scrollState)
                         .padding(start=20.dp,end=20.dp)) {
                         Header("뽀롱 NC")
+                        textBox("") { }
+                        Spacer(modifier = Modifier.height(20.dp))
                         MenuBox1("MenuBox1 Test 0",0)
                         Spacer(modifier = Modifier.height(20.dp))
                         MenuBox1("MenuBox1 Test 1",1)
@@ -74,7 +76,6 @@ class MainActivity : ComponentActivity() {
                         MenuBox1("MenuBox1 Test 2",2)
                         Spacer(modifier = Modifier.height(5.dp))
                         MenuBox1("MenuBox1 Test 3",3)
-                        Spacer(modifier = Modifier.height(20.dp))
                         Spacer(modifier = Modifier.height(20.dp))
                         ToggleButton(0);
                     }
@@ -209,20 +210,24 @@ fun textBox(initText:String?,onClickConfirm:(text:String)->Unit){
         singleLine = true,
         textStyle=TextStyle(
             fontWeight=FontWeight.SemiBold,
+            color=Color.Gray,
             fontSize=16.sp
         ),
         decorationBox={innerTextField ->
             Row(Modifier
                 .fillMaxWidth()
                 .height(50.dp)
-                .background(Color(0xFFD1D1D1))
                 .clip(RoundedCornerShape(50.dp))
+                .background(Color(0xFFE0E0E0))
                 .padding(start=15.dp,end=15.dp),
                 verticalAlignment = Alignment.CenterVertically){
                 Icon(
-                    imageVector= Icons.Rounded.Search
-                    tint=Color.Gray
+                    imageVector= Icons.Rounded.Search,
+                    contentDescription = "",
+                    tint = Color.Gray
                 )
+                Spacer(modifier=Modifier.width(15.dp))
+                innerTextField()
             }
         }
     )
