@@ -28,9 +28,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -216,6 +219,10 @@ fun textBox(initText:String?,onClickConfirm:(text:String)->Unit){
                 .clip(RoundedCornerShape(50.dp))
                 .padding(start=15.dp,end=15.dp),
                 verticalAlignment = Alignment.CenterVertically){
+                Icon(
+                    imageVector= Icons.Rounded.Search
+                    tint=Color.Gray
+                )
             }
         }
     )
