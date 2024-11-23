@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -44,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -89,6 +91,35 @@ class MainActivity : ComponentActivity() {
 
 
 enum class PressState{Pressed,Idle}
+
+fun Modifier.clickableToggle(onClick: () -> Unit)=composed{
+    var pressState by remember{mutableStateOf(PressState.Idle)}
+    val scale by animateFloatAsState(if(pressState==PressState.Pressed)0.9f else 1f)
+    clickable(
+        indication=null,
+        interactionSource = remember { MutableInteractionSource() }
+    ){
+        onClick()
+    }
+    this
+        .graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+        }
+        .pointerInput(pressState) {
+            awaitPointerEventScope {
+                pressState=if(pressState==PressState.Pressed){
+                    waitForUpOrCancellation()
+                    PressState.Idle
+                }
+                else{
+                    awaitFirstDown(false)
+                    PressState.Pressed
+                }
+            }
+        }
+}
+
 fun Modifier.clickable2(onClick:()->Unit)=composed{
     var pressState by remember{mutableStateOf(PressState.Idle)}
     //val scale by animateFloatAsState(if(pressState==PressState.Pressed)0.95f else 1f)
@@ -145,7 +176,8 @@ fun ToggleButton(ifOn:Int){
         .width(50.dp)
         .clip(RoundedCornerShape(30.dp))
         .background(Color(55,126,240,255))
-        .background(Color.Gray),
+        .background(Color.Gray)
+        .clickableToggle {  },
         verticalAlignment=Alignment.CenterVertically){
         Box(Modifier
             .padding(all=3.dp)
@@ -212,7 +244,7 @@ fun textBox(initText:String?,onClickConfirm:(text:String)->Unit){
         singleLine = true,
         textStyle=TextStyle(
             fontWeight=FontWeight.SemiBold,
-            color=Color.Gray,
+            color=Color.Black,
             fontSize=16.sp
         ),
         decorationBox={innerTextField ->
