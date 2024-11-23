@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -61,6 +61,8 @@ class MainActivity : ComponentActivity() {
             PNCTheme() {
                 val scrollState= rememberScrollState()
                 Surface(Modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .systemBarsPadding()
                     .fillMaxSize(1f),
                     color= MaterialTheme.colorScheme.background){
                     Column(Modifier
@@ -126,7 +128,7 @@ fun Header(hText:String,modifier:Modifier=Modifier){
     Column(
         Modifier.padding(start=10.dp,end=10.dp)
     ) {
-        Spacer(modifier = Modifier.statusBarsPadding());
+        //Spacer(modifier = Modifier.statusBarsPadding());
         Spacer(modifier = Modifier.height(100.dp));
         Text(
             text = "$hText",
@@ -140,10 +142,10 @@ fun Header(hText:String,modifier:Modifier=Modifier){
 fun ToggleButton(ifOn:Int){
     Row(modifier=Modifier
         .height(30.dp)
-        .width(60.dp)
+        .width(50.dp)
         .clip(RoundedCornerShape(30.dp))
         .background(Color(55,126,240,255))
-        .background(Color.LightGray),
+        .background(Color.Gray),
         verticalAlignment=Alignment.CenterVertically){
         Box(Modifier
             .padding(all=3.dp)
