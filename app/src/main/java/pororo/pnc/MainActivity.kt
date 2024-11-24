@@ -9,6 +9,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -33,7 +35,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,6 +48,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,27 +64,36 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PNCTheme() {
+                var screenNum=1
                 val scrollState= rememberScrollState()
-                Surface(Modifier
+                val scrollState2= rememberScrollState()
+                val configuration= LocalConfiguration.current
+                val screenW=configuration.screenWidthDp.dp
+                val screenH=configuration.screenHeightDp.dp
+                Row(Modifier
                     .background(MaterialTheme.colorScheme.background)
                     .systemBarsPadding()
-                    .fillMaxSize(1f),
-                    color= MaterialTheme.colorScheme.background){
-                    Column(Modifier
-                        .verticalScroll(scrollState)
-                        .padding(start=20.dp,end=20.dp)) {
-                        Header("뽀롱 NC")
-                        textBox("") { }
-                        Spacer(modifier = Modifier.height(20.dp))
-                        MenuBox1("MenuBox1 Test 0",0)
-                        Spacer(modifier = Modifier.height(20.dp))
-                        MenuBox1("MenuBox1 Test 1",1)
-                        Spacer(modifier = Modifier.height(5.dp))
-                        MenuBox1("MenuBox1 Test 2",2)
-                        Spacer(modifier = Modifier.height(5.dp))
-                        MenuBox1("MenuBox1 Test 3",3)
-                        Spacer(modifier = Modifier.height(20.dp))
-                        ToggleButton(0);
+                    .fillMaxSize(1f)){
+                    if(screenW<600.dp){
+                        Column(Modifier
+                            .verticalScroll(scrollState)
+                            .padding(start=20.dp,end=20.dp)) {
+                            Screen(screenNum,scrollState=scrollState)
+                        }
+                    }
+                    else{
+                        Column(Modifier
+                            .verticalScroll(scrollState)
+                            .padding(start=20.dp,end=20.dp)
+                            .width(300.dp)) {
+                            Screen(screenNum,scrollState)
+                        }
+                        Column(Modifier
+                            .verticalScroll(scrollState2)
+                            .padding(start=20.dp,end=20.dp)
+                            .fillMaxWidth()){
+
+                        }
                     }
                 }
             }
@@ -89,12 +101,29 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Composable
+fun Screen(screenNum:Int,scrollState: ScrollState){
+    if(screenNum==1){
+        Header(stringResource(R.string.app_name), hasBack = true, scrollState = scrollState)
+        textBox("") { }
+        Spacer(modifier = Modifier.height(20.dp))
+        MenuBox1("MenuBox1 Test 0",0)
+        Spacer(modifier = Modifier.height(20.dp))
+        MenuBox1("MenuBox1 Test 1",1)
+        Spacer(modifier = Modifier.height(5.dp))
+        MenuBox1("MenuBox1 Test 2",2)
+        Spacer(modifier = Modifier.height(5.dp))
+        MenuBox1("MenuBox1 Test 3",3)
+        Spacer(modifier = Modifier.height(20.dp))
+        ToggleButton(0)
+    }
+}
 
 enum class PressState{Pressed,Idle}
 
-fun Modifier.clickableToggle(onClick: () -> Unit)=composed{
+fun Modifier.clickableToggle(ifOn:Int,onClick: () -> Unit)=composed{
     var pressState by remember{mutableStateOf(PressState.Idle)}
-    val scale by animateFloatAsState(if(pressState==PressState.Pressed)0.9f else 1f)
+    val scale by animateFloatAsState(if(pressState==PressState.Pressed)0.95f else 1f)
     clickable(
         indication=null,
         interactionSource = remember { MutableInteractionSource() }
@@ -125,7 +154,7 @@ fun Modifier.clickable2(onClick:()->Unit)=composed{
     //val scale by animateFloatAsState(if(pressState==PressState.Pressed)0.95f else 1f)
     val animColor= animateColorAsState(
         targetValue = if(pressState==PressState.Pressed)Color(0xFFC8C8C8)else Color(0xFFFFFFFF),
-        animationSpec = tween(200,0,LinearEasing)
+        animationSpec = tween(150,0,LinearEasing)
     )
     clickable(
         indication=null,
@@ -155,19 +184,37 @@ fun Modifier.clickable2(onClick:()->Unit)=composed{
 }
 
 @Composable
-fun Header(hText:String,modifier:Modifier=Modifier){
-    Column(
-        Modifier.padding(start=10.dp,end=10.dp)
-    ) {
-        //Spacer(modifier = Modifier.statusBarsPadding());
-        Spacer(modifier = Modifier.height(100.dp));
-        Text(
-            text = "$hText",
-            style = TextStyle(fontSize = 50.sp, fontWeight = FontWeight.Bold)
-        );
-        Spacer(modifier=Modifier.height(20.dp));
+fun Header(hText:String, scrollState: ScrollState, hasBack: Boolean, modifier:Modifier=Modifier){
+    if(hasBack==true){
+        //var scrollPos=with(LocalDensity.current){scrollState.value.toDp()}.toString().toFloat()
+        Column(
+            Modifier.padding(start=10.dp,end=10.dp)
+        ) {
+            //Spacer(modifier = Modifier.statusBarsPadding())
+            Spacer(modifier = Modifier.height(100.dp))
+            Text(
+                text = "$hText",
+                style = TextStyle(fontSize = 50.sp, fontWeight = FontWeight.Bold)
+            )
+            Spacer(modifier=Modifier.height(20.dp))
+        }
+    }
+    else{
+        Column(
+            Modifier.padding(start=10.dp,end=10.dp)
+        ) {
+            //Spacer(modifier = Modifier.statusBarsPadding())
+            Spacer(modifier = Modifier.height(100.dp))
+            Text(
+                text = "$hText",
+                style = TextStyle(fontSize = 50.sp, fontWeight = FontWeight.Bold)
+            )
+            Spacer(modifier=Modifier.height(20.dp))
+        }
     }
 }
+
+
 
 @Composable
 fun ToggleButton(ifOn:Int){
@@ -177,7 +224,7 @@ fun ToggleButton(ifOn:Int){
         .clip(RoundedCornerShape(30.dp))
         .background(Color(55,126,240,255))
         .background(Color.Gray)
-        .clickableToggle {  },
+        .clickableToggle(ifOn,{}),
         verticalAlignment=Alignment.CenterVertically){
         Box(Modifier
             .padding(all=3.dp)
@@ -262,6 +309,10 @@ fun textBox(initText:String?,onClickConfirm:(text:String)->Unit){
                 )
                 Spacer(modifier=Modifier.width(15.dp))
                 innerTextField()
+                if(text.value==""){
+                    Text(text=stringResource(R.string.search_ph),color=Color.Gray,fontSize=16.sp,modifier=Modifier
+                        .offset(x=-110.dp))
+                }
             }
         }
     )

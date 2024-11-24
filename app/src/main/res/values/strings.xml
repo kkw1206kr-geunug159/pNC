@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">pNC</string>
+    <string name="app_name">Porong</string>
+    <string name="search_ph">Search</string>
 </resources>
